@@ -17,7 +17,7 @@ ec2:DeleteVolume
 
 Cleanup (Cost Optimization)
 A) Remove stopped instances
-=======================cost optimization same region in same account================================
+=======================cost optimization same region in same account===================stopped instances=============
 
 #! /bin/bash
 
@@ -32,7 +32,17 @@ do
   echo "Terminating instance: $instance"
   aws ec2 terminate-instances --instance-ids $instance
 done
-==========================================
+==========================================# Release unattached Elastic IPs
+eips=$(aws ec2 describe-addresses \
+  --query "Addresses[?InstanceId==null].AllocationId" \
+  --output text)
+
+for eip in $eips
+do
+  echo "Releasing unattached Elastic IP: $eip"
+  aws ec2 release-address --allocation-id $eip
+done
+===========================================================================================Remove unattached volumes
 Remove unattached volumes
 #!/bin/bash
 
