@@ -32,6 +32,34 @@ do
   echo "Terminating instance: $instance"
   aws ec2 terminate-instances --instance-ids $instance
 done
+
+============================cost optimization all region in same account===================stopped instances
+#!/bin/bash
+
+# Get all AWS regions
+regions=$(aws ec2 describe-regions --query "Regions[*].RegionName" --output text)
+
+# Loop through each region
+for region in $regions
+do
+  echo "Processing region: $region"
+
+  # Get all stopped instances in this region
+  instances=$(aws ec2 describe-instances \
+    --region $region \
+    --filters Name=instance-state-name,Values=stopped \
+    --query 'Reservations[*].Instances[*].InstanceId' \
+    --output text)
+
+  # Terminate stopped instances
+  for instance in $instances
+  do
+    echo "Terminating instance: $instance in region: $region"
+    aws ec2 terminate-instances --region $region --instance-ids $instance
+  done
+
+done
+
 ==========================================# Release unattached Elastic IPs
 eips=$(aws ec2 describe-addresses \
   --query "Addresses[?InstanceId==null].AllocationId" \
