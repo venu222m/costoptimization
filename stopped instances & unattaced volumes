@@ -1,0 +1,49 @@
+pre req:
+Step 1 — Pre-requisites
+You need:
+
+ec2 server setup:
+1.AWS CLI installed (for shell script) OR boto3 installed (for Python)
+
+2.IAM credentials with permissions:
+
+ec2:DescribeInstances
+
+ec2:DescribeVolumes
+
+ec2:TerminateInstances
+
+ec2:DeleteVolume
+
+Cleanup (Cost Optimization)
+A) Remove stopped instances
+=======================cost optimization same region in same account================================
+
+#! /bin/bash
+
+# stopped instances
+instances=$(aws ec2 describe-instances \
+  --filters Name=instance-state-name,Values=stopped \
+  --query 'Reservations[*].Instances[*].InstanceId' \
+  --output text)
+
+for instance in $instances
+do
+  echo "Terminating instance: $instance"
+  aws ec2 terminate-instances --instance-ids $instance
+done
+==========================================
+Remove unattached volumes
+#!/bin/bash
+
+# Get available volumes
+volumes=$(aws ec2 describe-volumes \
+  --filters Name=status,Values=available \
+  --query 'Volumes[*].VolumeId' \
+  --output text)
+
+for volume in $volumes
+do
+  echo "Deleting volume: $volume"
+  aws ec2 delete-volume --volume-id $volume
+done
