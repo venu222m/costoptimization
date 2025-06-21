@@ -1,27 +1,17 @@
 stopped instances & unattaced volumes &  release eip(shell script)
 pre req:
 Step 1 — Pre-requisites
-You need:
+1.ec2 server setup:
+2.AWS CLI installed (for shell script) OR boto3 installed (for Python)
+3.iam role or aws configuee(keys)
+4.5 server setup ec2 & 2 unattched & 1 eip us-east-1 check with single region shell script
+5.1 server ohio & 2 unattached ebs vol tokyo & 1 eip Oregon check multli region shell script
 
-ec2 server setup:
-1.AWS CLI installed (for shell script) OR boto3 installed (for Python)
-
-2.IAM credentials with permissions:
-
-ec2:DescribeInstances
-
-ec2:DescribeVolumes
-
-ec2:TerminateInstances
-
-ec2:DeleteVolume
-
-Cleanup (Cost Optimization)
 A) Remove stopped instances
 =======================cost optimization same region in same account===================stopped instances=============
 
 #! /bin/bash
-
+set -x
 # stopped instances
 instances=$(aws ec2 describe-instances \
   --filters Name=instance-state-name,Values=stopped \
@@ -36,7 +26,7 @@ done
 
 ============================cost optimization all region in same account===================stopped instances
 #!/bin/bash
-
+set-x
 # Get all AWS regions
 regions=$(aws ec2 describe-regions --query "Regions[*].RegionName" --output text)
 
@@ -62,6 +52,8 @@ do
 done
 
 ==========================================# Release unattached Elastic IPs
+#! /bin/bash
+set -x
 eips=$(aws ec2 describe-addresses \
   --query "Addresses[?InstanceId==null].AllocationId" \
   --output text)
@@ -74,7 +66,7 @@ done
 ===========================================================================================Remove unattached volumes
 Remove unattached volumes
 #!/bin/bash
-
+set -x
 # Get available volumes
 volumes=$(aws ec2 describe-volumes \
   --filters Name=status,Values=available \
@@ -91,6 +83,7 @@ done
 #!/bin/bash
 
 set -e
+set -x
 
 echo "Starting AWS Multi-Region Cost Optimization..."
 
