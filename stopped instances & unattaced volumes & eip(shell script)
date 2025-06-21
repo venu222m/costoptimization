@@ -4,7 +4,7 @@ Step 1 — Pre-requisites
 1.ec2 server setup:
 2.AWS CLI installed (for shell script) OR boto3 installed (for Python)
 3.iam role or aws configuee(keys)
-4.5 server setup ec2 & 2 unattched & 1 eip us-east-1 check with single region shell script
+4.5 server setup ec2 & 2 unattched ebs vol& 1 eip us-east-1 check with single region shell script
 5.1 server ohio & 2 unattached ebs vol tokyo & 1 eip Oregon check multli region shell script
 
 A) Remove stopped instances
