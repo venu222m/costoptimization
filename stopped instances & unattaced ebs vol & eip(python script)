@@ -32,3 +32,11 @@ for volume in volumes['Volumes']:
     volume_id = volume['VolumeId']
     print(f"Deleting volume: {volume_id}")
     ec2.delete_volume(VolumeId=volume_id)
+# Release unattached Elastic IPs
+addresses = ec2.describe_addresses()
+
+for address in addresses['Addresses']:
+    if 'InstanceId' not in address or address['InstanceId'] is None:
+        allocation_id = address['AllocationId']
+        print(f"Releasing unattached Elastic IP: {allocation_id}")
+        ec2.release_address(AllocationId=allocation_id)
