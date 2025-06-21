@@ -1,0 +1,34 @@
+pre -req:
+ubuntu server setup:
+iam access aws configure 
+
+apt update
+ apt install jq -y
+ apt install python3-pip
+ pip3 --version
+ pip3 install boto3
+root@ip-192-168-2-44:~# cat cost.py
+import boto3
+
+ec2 = boto3.client('ec2', region_name='us-east-1')
+
+# Delete stopped instances
+instances = ec2.describe_instances(
+    Filters=[{'Name': 'instance-state-name', 'Values': ['stopped']}]
+)
+
+for reservation in instances['Reservations']:
+    for instance in reservation['Instances']:
+        instance_id = instance['InstanceId']
+        print(f"Terminating instance: {instance_id}")
+        ec2.terminate_instances(InstanceIds=[instance_id])
+
+# Delete available volumes
+volumes = ec2.describe_volumes(
+    Filters=[{'Name': 'status', 'Values': ['available']}]
+)
+
+for volume in volumes['Volumes']:
+    volume_id = volume['VolumeId']
+    print(f"Deleting volume: {volume_id}")
+    ec2.delete_volume(VolumeId=volume_id)
