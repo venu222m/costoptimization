@@ -85,3 +85,62 @@ do
   echo "Deleting volume: $volume"
   aws ec2 delete-volume --volume-id $volume
 done
+
+======================================tarting AWS Multi-Region Cost Optimization ec2 stopped instances & unattaced ebs vol & release eip==========
+#!/bin/bash
+
+set -e
+
+echo "Starting AWS Multi-Region Cost Optimization..."
+
+# Get all AWS regions
+regions=$(aws ec2 describe-regions --query "Regions[*].RegionName" --output text)
+
+for region in $regions
+do
+  echo "-------------------------------"
+  echo "Processing region: $region"
+  echo "-------------------------------"
+
+  # 1️⃣ Terminate stopped instances
+  instances=$(aws ec2 describe-instances \
+    --region $region \
+    --filters Name=instance-state-name,Values=stopped \
+    --query 'Reservations[*].Instances[*].InstanceId' \
+    --output text)
+
+  for instance in $instances
+  do
+    echo "Terminating stopped instance: $instance"
+    aws ec2 terminate-instances --region $region --instance-ids $instance
+  done
+
+  # 2️⃣ Delete unattached EBS volumes
+  volumes=$(aws ec2 describe-volumes \
+    --region $region \
+    --filters Name=status,Values=available \
+    --query 'Volumes[*].VolumeId' \
+    --output text)
+
+  for volume in $volumes
+  do
+    echo "Deleting unattached EBS volume: $volume"
+    aws ec2 delete-volume --region $region --volume-id $volume
+  done
+
+  # 3️⃣ Release unattached Elastic IPs
+  eips=$(aws ec2 describe-addresses \
+    --region $region \
+    --query 'Addresses[?InstanceId==null].AllocationId' \
+    --output text)
+
+  for eip in $eips
+  do
+    echo "Releasing unattached Elastic IP: $eip"
+    aws ec2 release-address --region $region --allocation-id $eip
+  done
+
+done
+
+echo "✅ AWS Multi-Region Cleanup Completed!"
+
