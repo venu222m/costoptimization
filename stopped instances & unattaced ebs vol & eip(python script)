@@ -25,6 +25,59 @@ export AWS_SECRET_ACCESS_KEY=your_secret_key
 export AWS_DEFAULT_REGION=us-east-1
 
 This way, you don’t modify system Python — everything stays clean.
+--------------------------explantion start
+Step 1 — Import boto3 module
+boto3 is the official AWS SDK for Python.
+
+It allows Python programs to interact with AWS services (like EC2, S3, Lambda, etc).
+step 2- creating ec2 client
+You are creating an EC2 client object.
+
+boto3.client('ec2') means: "I want to interact with AWS EC2 service."
+step 3 : describe instance which are stopped state
+instances = ec2.describe_instances(
+    Filters=[{'Name': 'instance-state-name', 'Values': ['stopped']}]
+)
+
+ste4: 
+The result returned by describe_instances() has a nested structure:
+A nested structure means:
+
+Data inside data.
+Lists inside lists.
+Dictionaries inside dictionaries.
+root@ip-172-31-94-241:~# aws ec2 describe-instances --query 'Reservations[*].ReservationId'
+[
+    "r-00c2de7130527ba9c",
+    "r-0e0582a86fc1d3aed",
+    "r-0154a91230a2680bc"
+]
+
+Reservations → list of reservations (groups of instances)
+
+Each reservation has one or more Instances
+
+step 5: Step 5 — Get instance ID
+
+instance_id = instance['InstanceId']
+Extract the unique instance ID for each EC2 instance.
+
+Example: i-0e9e68ab12345678f
+Step 6 — Print instance being terminated
+print(f"Terminating instance: {instance_id}")
+Useful for monitoring or debugging.
+
+This prints to console which instance is being terminated.
+
+Step 7 — Call terminate_instances API
+
+ec2.terminate_instances(InstanceIds=[instance_id])
+
+Useful for monitoring or debugging.
+=====================================explanation end
+
+
+region_name='us-east-1' tells boto3 which AWS region you want to work in.
 root@ip-192-168-2-44:~# cat cost.py
 import boto3
 
