@@ -7,6 +7,31 @@ apt update
  apt install python3-pip
  pip3 --version
  pip3 install boto3
+If you see the PEP 668 warning:
+"You are attempting to install a package into a system Python environment which is protected..."
+
+That’s because newer Debian/Ubuntu protect system Python by default.
+
+✅ Safe way: Use virtual environment
+1️⃣ Create a virtual environment:
+
+bash
+Copy
+Edit
+python3 -m venv myenv
+2️⃣ Activate it:
+
+bash
+Copy
+Edit
+source myenv/bin/activate
+3️⃣ Now install boto3:
+
+bash
+Copy
+Edit
+pip install boto3
+This way, you don’t modify system Python — everything stays clean.
 root@ip-192-168-2-44:~# cat cost.py
 import boto3
 
