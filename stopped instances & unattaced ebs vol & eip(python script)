@@ -87,7 +87,7 @@ ec2.terminate_instances(InstanceIds=[instance_id])
 
 =====================================explanation end
 
-==============================
+==============================tarting AWS single Region Cost Optimization ec2 stopped instances & unattaced ebs vol & release eip
 import boto3
 
 ec2 = boto3.client('ec2', region_name='us-east-1')
@@ -120,7 +120,7 @@ for address in addresses['Addresses']:
         allocation_id = address['AllocationId']
         print(f"Releasing unattached Elastic IP: {allocation_id}")
         ec2.release_address(AllocationId=allocation_id)
-==========================multi region 
+==========================tarting AWS Multi-Region Cost Optimization ec2 stopped instances & unattaced ebs vol & release eip
 import boto3
 
 # Get all available AWS regions for EC2
