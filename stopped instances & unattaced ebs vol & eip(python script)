@@ -46,6 +46,18 @@ A nested structure means:
 Data inside data.
 Lists inside lists.
 Dictionaries inside dictionaries.
+Reservations [
+   └─ ReservationId: r-12345678
+         └─ Instances [
+             └─ InstanceId: i-0abcd123456789 (stopped)
+             └─ InstanceId: i-0abcd123456790 (running)
+         ]
+   └─ ReservationId: r-87654321
+         └─ Instances [
+             └─ InstanceId: i-0abcd123456791 (stopped)
+         ]
+]
+
 root@ip-172-31-94-241:~# aws ec2 describe-instances --query 'Reservations[*].ReservationId'
 [
     "r-00c2de7130527ba9c",
