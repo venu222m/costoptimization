@@ -75,9 +75,7 @@ ec2.terminate_instances(InstanceIds=[instance_id])
 Useful for monitoring or debugging.
 =====================================explanation end
 
-
-region_name='us-east-1' tells boto3 which AWS region you want to work in.
-root@ip-192-168-2-44:~# cat cost.py
+==============================
 import boto3
 
 ec2 = boto3.client('ec2', region_name='us-east-1')
@@ -110,3 +108,46 @@ for address in addresses['Addresses']:
         allocation_id = address['AllocationId']
         print(f"Releasing unattached Elastic IP: {allocation_id}")
         ec2.release_address(AllocationId=allocation_id)
+==========================multi region 
+import boto3
+
+# Get all available AWS regions for EC2
+ec2_client = boto3.client('ec2')
+regions_response = ec2_client.describe_regions()
+regions = [region['RegionName'] for region in regions_response['Regions']]
+
+# Loop through each region
+for region in regions:
+    print(f"\nProcessing region: {region}")
+    ec2 = boto3.client('ec2', region_name=region)
+
+    # Delete stopped instances
+    instances = ec2.describe_instances(
+        Filters=[{'Name': 'instance-state-name', 'Values': ['stopped']}]
+    )
+
+    for reservation in instances['Reservations']:
+        for instance in reservation['Instances']:
+            instance_id = instance['InstanceId']
+            print(f"Terminating instance: {instance_id}")
+            ec2.terminate_instances(InstanceIds=[instance_id])
+
+    # Delete available volumes
+    volumes = ec2.describe_volumes(
+        Filters=[{'Name': 'status', 'Values': ['available']}]
+    )
+
+    for volume in volumes['Volumes']:
+        volume_id = volume['VolumeId']
+        print(f"Deleting volume: {volume_id}")
+        ec2.delete_volume(VolumeId=volume_id)
+
+    # Release unattached Elastic IPs
+    addresses = ec2.describe_addresses()
+
+    for address in addresses['Addresses']:
+        if 'InstanceId' not in address or address['InstanceId'] is None:
+            allocation_id = address['AllocationId']
+            print(f"Releasing unattached Elastic IP: {allocation_id}")
+            ec2.release_address(AllocationId=allocation_id)
+
