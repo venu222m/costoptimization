@@ -1,3 +1,10 @@
+intervview queastions
+do you have exp with python in project ?
+do you have exp with lambda function?
+are you did any automation task by using python in our project?
+
+#concept:
+stopped instances & unattaced ebs vol & eip(python script)
 pre -req:
 1.ubuntu server setup:
 2.iam access aws configure ec2 access or admin acces
